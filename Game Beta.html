@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XO Game</title>
+
+  <!-- เชื่อมโยงไฟล์ CSS -->
+  <link rel="stylesheet" href="Game1-2.css"> 
+</head>
+<body>
+  <h1>XO Game with Animation</h1>
+  
+  <!-- แสดงคะแนน -->
+  <div>
+    <p id="score">Player X: 0 - Player O: 0</p>
+  </div>
+
+  <!-- โหมดเล่น -->
+  <div>
+    <button class="mode" id="playerMode">Play: 2 Players</button>
+    <button class="mode" id="aiMode">Play: Player vs AI</button>
+  </div>
+
+  <!-- แสดงกระดาน -->
+  <div class="board" id="board"></div>
+
+  <!-- แสดงผู้ชนะ -->
+  <p class="winner" id="winner"></p>
+
+  <!-- รีเซ็ตเกม -->
+  <button class="reset" id="reset">Reset Game</button>
+
+  <!-- เชื่อมโยงไฟล์ JavaScript -->
+  <script src="Game1-2.Js"></script>
+</body>
+</html>
