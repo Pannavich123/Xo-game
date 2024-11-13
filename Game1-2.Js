@@ -3,16 +3,20 @@ const winnerElement = document.getElementById('winner');
 const resetButton = document.getElementById('reset');
 const playerModeButton = document.getElementById('playerMode');
 const aiModeButton = document.getElementById('aiMode');
-const scoreElement = document.getElementById('score');
+const scoreX = document.getElementById('scoreX');
+const scoreO = document.getElementById('scoreO');
+const scoreDraw = document.getElementById('scoreDraw');
 
 let board = Array(9).fill(null);
 let currentPlayer = 'X';
 let gameOver = false;
 let isVsAI = false;
-let playerXScore = 0;
-let playerOScore = 0;
 
-// แสดงกระดาน
+// Score tracking
+let xWins = 0;
+let oWins = 0;
+let draws = 0;
+
 function renderBoard() {
   boardElement.innerHTML = '';
   board.forEach((cell, index) => {
@@ -29,34 +33,66 @@ function renderBoard() {
   });
 }
 
-// การคลิกที่ช่องกระดาน
 function handleCellClick(index) {
   if (board[index] || gameOver) return;
 
   board[index] = currentPlayer;
-  renderBoard();
-
   if (checkWinner()) {
-    winnerElement.textContent = `Player ${currentPlayer} Wins!`;
-    updateScore();
+    winnerElement.textContent = `${currentPlayer} Wins!`;
+    updateScore(currentPlayer);
     gameOver = true;
     return;
   }
 
   if (board.every(cell => cell)) {
     winnerElement.textContent = "It's a draw!";
+    draws++;
+    scoreDraw.textContent = draws;
     gameOver = true;
     return;
   }
 
   currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-  
+  renderBoard();
+
   if (isVsAI && currentPlayer === 'O') {
     setTimeout(aiMove, 500);
   }
 }
 
-// ตรวจสอบผู้ชนะ
+function aiMove() {
+  if (gameOver) return;
+
+  const bestMove = findBestMove();
+  board[bestMove] = 'O';
+
+  if (checkWinner()) {
+    winnerElement.textContent = "AI Wins!";
+    oWins++;
+    scoreO.textContent = oWins;
+    gameOver = true;
+    return;
+  }
+
+  if (board.every(cell => cell)) {
+    winnerElement.textContent = "It's a draw!";
+    draws++;
+    scoreDraw.textContent = draws;
+    gameOver = true;
+    return;
+  }
+
+  currentPlayer = 'X';
+  renderBoard();
+}
+
+function findBestMove() {
+  const availableMoves = board
+    .map((cell, index) => (cell === null ? index : null))
+    .filter(index => index !== null);
+  return availableMoves[0];  // AI just picks the first available move
+}
+
 function checkWinner() {
   const winningCombinations = [
     [0, 1, 2],
@@ -66,7 +102,7 @@ function checkWinner() {
     [1, 4, 7],
     [2, 5, 8],
     [0, 4, 8],
-    [2, 4, 6]
+    [2, 4, 6],
   ];
 
   return winningCombinations.some(combination => {
@@ -75,73 +111,42 @@ function checkWinner() {
   });
 }
 
-// การเดินหมากของ AI
-function aiMove() {
-  if (gameOver) return;
-
-  const availableMoves = board.map((cell, index) => cell === null ? index : null).filter(index => index !== null);
-  const move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-
-  board[move] = 'O';
-  renderBoard();
-
-  if (checkWinner()) {
-    winnerElement.textContent = "AI Wins!";
-    updateScore();
-    gameOver = true;
-    return;
-  }
-
-  if (board.every(cell => cell)) {
-    winnerElement.textContent = "It's a draw!";
-    gameOver = true;
-    return;
-  }
-
-  currentPlayer = 'X';
-}
-
-// อัปเดตคะแนน
-function updateScore() {
-  if (currentPlayer === 'X') {
-    playerXScore++;
+function updateScore(winner) {
+  if (winner === 'X') {
+    xWins++;
+    scoreX.textContent = xWins;
   } else {
-    playerOScore++;
+    oWins++;
+    scoreO.textContent = oWins;
   }
-  scoreElement.textContent = `Player X: ${playerXScore} - Player O: ${playerOScore}`;
 }
 
-// รีเซ็ตเกม
 function resetGame() {
-  board.fill(null);
+  board = Array(9).fill(null);
   currentPlayer = 'X';
   gameOver = false;
   winnerElement.textContent = '';
   renderBoard();
 }
 
-// เลือกโหมดเล่น 2 คน
+function startGame() {
+  board = Array(9).fill(null);
+  currentPlayer = 'X';
+  gameOver = false;
+  winnerElement.textContent = '';
+  boardElement.style.display = 'grid';
+  resetButton.style.display = 'inline-block';
+  renderBoard();
+}
+
 playerModeButton.addEventListener('click', () => {
   isVsAI = false;
   startGame();
 });
 
-// เลือกโหมดเล่นกับ AI
 aiModeButton.addEventListener('click', () => {
   isVsAI = true;
   startGame();
 });
 
-// เริ่มเกม
-function startGame() {
-  board.fill(null);
-  currentPlayer = 'X';
-  gameOver = false;
-  winnerElement.textContent = '';
-  renderBoard();
-}
-
-// รีเซ็ตเกม
 resetButton.addEventListener('click', resetGame);
-
-renderBoard();
